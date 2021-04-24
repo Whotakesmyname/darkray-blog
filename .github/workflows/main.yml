@@ -1,0 +1,41 @@
+name: Build & Deploy
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy2tencent:
+    environment: production-tencent
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout full code with theme
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          
+      - name: Hugo setup
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: latest
+          extended: true
+          
+      - name: Tencent CloudBase Github Action
+        uses: TencentCloudBase/cloudbase-action@v2
+        with:
+          # 云开发 secretId
+          secretId: ${{secrets.ID}}
+          # 云开发 secretKey
+          secretKey: ${{secrets.KEY}}
+          # 云开发环境 Id
+          envId: ${{secrets.ENV}}

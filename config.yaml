@@ -1,0 +1,127 @@
+baseURL: 'https://blog.darkray.cn'
+languageCode: en-us
+title: Darkray Blog
+paginate: 10
+theme: hugo-theme-stack
+
+DefaultContentLanguage: en
+
+permalinks:
+    post: /p/:slug/
+    page: /:slug/
+
+params:
+    mainSections:
+        - post
+    featuredImageField: image
+    rssFullContent: true
+    # favicon is defined in custom header
+    favicon:
+
+    footer:
+        since: 2016
+        customText: '<a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11010802025962">京公网安备11010802025962号</a>&emsp;<a target="_blank" href="https://beian.miit.gov.cn/">京ICP备17050464号-1</a>'
+
+    dateFormat:
+        published: Jan 02, 2006
+        lastUpdated: Jan 02, 2006 15:04 MST
+
+    sidebar:
+        emoji: 🔧
+        subtitle: Catch me.
+        avatar:
+            local: true
+            src: img/avatar.jpg
+
+    article:
+        math: true
+        license:
+            enabled: true
+            default: Darkray Blog is licensed under CC BY-NC-ND 4.0
+
+    comments:
+        enabled: true
+        provider: utterances
+
+        utterances:
+            repo: Whotakesmyname/darkray-blog
+            issueTerm: pathname
+            label: comment
+
+        remark42:
+            host:
+            site:
+            locale:
+
+    widgets:
+        enabled:
+            - search
+            - archives
+            - tag-cloud
+
+        archives:
+            limit: 5
+
+        tagCloud:
+            limit: 20
+
+    opengraph:
+        twitter:
+            # Your Twitter username
+            site:
+
+            # Available values: summary, summary_large_image
+            card: summary_large_image
+
+    defaultImage:
+        opengraph:
+            enabled: true
+            local: true
+            src: img/opengraph.jpg
+
+    colorScheme:
+        # Display toggle
+        toggle: true
+
+        # Available values: auto, light, dark
+        default: auto
+
+    imageProcessing:
+        cover:
+            enabled: true
+        content:
+            enabled: true
+
+menu:
+    main:
+        - identifier: home
+          name: Home
+          url: /
+          weight: -100
+          pre: home
+
+        - identifier: github
+          name: Github
+          url: https://github.com/Whotakesmyname
+          weight: -80
+          pre: brand-github
+
+related:
+    includeNewer: true
+    threshold: 60
+    toLower: true
+    indices:
+        - name: tags
+          weight: 150
+
+        - name: categories
+          weight: 200
+
+markup:
+    highlight:
+        noClasses: false
+        linenos: true
+        guessSyntax: true
+    goldmark:
+        renderer:
+            unsafe: true

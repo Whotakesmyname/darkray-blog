@@ -1,0 +1,20 @@
+{
+    "envId": "{{env.ENV_ID}}",
+    "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
+    "version": "2.0",
+    "framework": {
+      "name": "darkray-blog",
+      "plugins": {
+        "client": {
+          "use": "@cloudbase/framework-plugin-website",
+          "inputs": {
+            "installCommand": "",
+            "buildCommand": "hugo --minify --gc --enableGitInfo",
+            "outputPath": "public",
+            "cloudPath": "/",
+            "ignore": [".git", ".github", "node_modules", "cloudbaserc.js"]
+          }
+        }
+      }
+    }
+  }
