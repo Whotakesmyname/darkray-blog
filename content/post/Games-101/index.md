@@ -650,4 +650,144 @@ void intersect(Ray ray, BVH node) {
 }
 ```
 
-### 辐射度量学 Basic radiometry
+### 辐射度量学 Basic Radiometry
+*学物理可太快乐了*
+
+#### 光的空间属性
+- radiant flux 辐射通量
+- intensity 辐射强度
+- irradiance
+- radiance
+
+##### Radiant Energy and Flux (Power)
+- energe Q in J(oule)
+- flux (power) $\Phi \equiv \frac{dQ}{dt}$ in W(att) / lm (lumen)
+
+##### Important Light Measurements of Interest
+- light emitted from a source: radiant intesity
+- light falling on a surface: irradiance
+- light traveling along a ray: radiance
+
+##### Radiant Intensity
+power per unit **solid angle**(立体角): $I(\omega) \equiv \frac{d \Phi}{d \omega}$ in **c**an**d**ela, W or lm divided by solid angle.
+
+*坎德拉是基本单位之一，代表光亮度，光亮度与能量不是同一概念。可能是借用？*
+
+###### Solid Angle
+立体角度对应球面面积除以半径平方. 球面立体角4pi.
+
+{{<asis>}}
+$$
+dA = (rd \theta)(r \sin \theta d \phi) = r^2 \sin \theta d \theta d \phi \\
+d \omega = \frac{dA}{r^2} = \sin \theta d \theta d \phi
+$$
+{{</asis>}}
+
+$\theta$作为纵向角，$\phi$作为横向角，两者定义方向向量$\omega$。
+
+###### 各向同性点光源 Isotroppic Point Source
+{{<asis>}}
+$$
+\Phi = \int_{S^2} Id \omega = 4\pi I \\
+I = \frac{\Phi}{4\pi}
+$$
+{{</asis>}}
+
+## L15 光线追踪 Ray Tracing
+
+##### Irradiance
+Power per unit area. 光线垂直打到表面上。
+
+{{<asis>}}
+$$
+E(x) = \frac{d\Phi(x)}{dA}
+$$
+{{</asis>}}
+单位lux(lm/m^2)
+
+##### Radiance
+Power emitted/reflected/transmitted/received by a surface, per unit solid angle, per projected unit area. 理解为单位面积朝单位立体角辐射/被辐射的能量（*此处指功率，下同*）
+
+{{<asis>}}
+$$
+L(p, \omega) \equiv \frac{d^2\Phi(p, \omega)}{d\omega dA\cos\theta}
+$$
+{{</asis>}}
+
+单位nit(cd/m^2)
+
+#### Bidirectional Reflectance Distribution Function (BRDF)
+表示从每个入射角反射到每个出射角的光线量
+
+{{<asis>}}
+$$
+f_r(\omega_i \rightarrow \omega_r) = \frac{dL_r(\omega_r)}{dE_i(\omega_i)} = \frac{dL_r(\omega_r)}{L_i(\omega_i)\cos\theta_id\omega_i}
+$$
+{{</asis>}}
+
+单位1/sr。*个人理解可以理解为对于一个出射方向能量，各个入射方向的贡献分布。*
+
+#### 反射方程 Reflection Equation
+对于特定观察方向（出射角），辐射光量为
+
+{{<asis>}}
+$$
+L_r(p, \omega_r) = \int_{H^2}f_r(p, \omega_i\rightarrow\omega_r)L_i(p, \omega_i)\cos\theta_id\omega_i
+$$
+{{</asis>}}
+
+这个方程是递归求解的。麻烦。
+
+#### 渲染方程 Rendering Equation
+增加一个发射光量。得到
+
+{{<asis>}}
+$$
+L_o(p, \omega_r) = L_e(p, \omega_o) + \int_{\Omega^+}L_i(p, \omega_i)f_r(p, \omega_i, \omega_o)(n\cdot\omega_i)d\omega_i
+$$
+{{</asis>}}
+
+即渲染方程。
+
+已知发射intensity，BRDF，入射角度，可以将式子简写为
+
+{{<asis>}}
+$$
+\begin{aligned}
+I(u) &= e(u) + \int I(v)K(u,v)dv \\
+\implies L &= E + KL
+\end{aligned}
+$$
+{{</asis>}}
+
+其中K为equation kernel，Light Transport Operator。这是一个经典形式的第二类Fredholm积分方程：有良好的数值解。
+
+*艹，接下来开始不明所以但很有道理的……泛函分析？PDE？还是基于什么别的东西的推导。函数当矩阵算好爽啊。以及一个二项展开。这级数收敛性……据说是收敛的。*
+
+{{<asis>}}
+$$
+\begin{aligned}
+L&=E+KL\\
+IL-KL&=E\\
+(I-K)L&=E\\
+L&=(I-K)^{-1}E\\
+L&=(I+K+K^2+K^3+\ldots)E\\
+L&=E+KE+K^2E+K^3E+\ldots
+\end{aligned}
+$$
+{{</asis>}}
+
+我们得到了一个级数。第一项为光源直射，第二项为直接光照，第三项为弹射一次的间接光照，之后为更多次的间接光照。**作为经典光栅化着色，我们得到的是光源直射和直接光照的近似**（近似到前两项）。
+
+##### 概率论回顾
+*概率论还没忘那么多，不多回顾了*
+
+{{<asis>}}
+$$
+X \sim p(x)\\
+Y = f(X) \\
+E[Y] = E[f(X)] = \int f(x)p(x)dx
+$$
+{{</asis>}}
+
+## L16 光线追踪（蒙特卡洛路径追踪） Ray Tracing (Monte Carlo Path Tracing)
