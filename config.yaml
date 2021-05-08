@@ -125,3 +125,7 @@ markup:
     goldmark:
         renderer:
             unsafe: true
+    tableOfContents:
+        endLevel: 5
+        ordered: true
+        startLevel: 1
