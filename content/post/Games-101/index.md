@@ -845,4 +845,86 @@ $$
 *他保证难的都过去了。这个梯度可真好。可能老师期望不是很高吧hhhh*
 
 ## L17 材质与外观 Materials and Appearances
+Material = BRDF
 
+### 漫反射材质 Diffuse/Lambertian Material
+假设入射光线是均匀的，在各个方向上都是常数   
+*这个假设其实没有很确信起因。模型上来讲只能说因为漫反射出射光与入射光无关，因此做这么个假设简化计算。但如此BRDF分布就被大大简化了……不过确实变得可解了。*
+*本来一直好奇BRDF这么个复杂的二维概率分布该怎么实现，所以BRDF最后还是会退化么。*
+{{<asis>}}
+$$
+\begin{aligned}
+L_o(\omega_o) &= \int_{H^2}f_rL_i(\omega_i)\cos\theta_id\omega_i \\
+&= f_rL_i\int_{H^2}\cos\theta_id\omega_i \\
+&= \pi f_rL_i
+\end{aligned}
+$$
+{{</asis>}}
+
+可知$f_r = \frac{1}{\pi}$时能量守恒，完全反射入射光。定义$f_r = \frac{\rho}{\pi}$，$\rho$为反射率（albedo(color)），在0到1之间。
+
+### 完全镜面反射 Perfect Specular Reflection
+平行四边形法则得出射角，方位角180度。
+
+### 折射 Refraction
+#### 斯涅耳定律
+$\eta_i\sin\theta_i = \eta_t\sin\theta_t$
+{{<asis>}}
+$$
+\begin{aligned}
+\eta_i\sin\theta_i &= \eta_t\sin\theta_t \\
+\cos\theta_t &= \sqrt{1 - \sin^2\theta_t} \\
+&= \sqrt{1-(\frac{\eta_i}{\eta_t})^2\sin^2\theta_i} \\
+&= \sqrt{1-(\frac{\eta_i}{\eta_t})^2(1 - \cos^2\theta_i)} \\ \\
+1-(\frac{\eta_i}{\eta_t})^2(1 - \cos^2\theta_i) \ge 0
+\end{aligned}
+$$
+{{</asis>}}
+
+### 菲涅尔项 Fresnel Term
+反射性和法线夹角、光线极化有关。法线夹角越大，反射性越强，反射能量越多。（玻璃越斜看越不透明）
+
+导体绝缘体菲涅尔项不同。
+
+{{<asis>}}
+$$
+R_s = \left|\frac{n_1\cos\theta_i-n_2\cos\theta_t}{n_1\cos\theta_i+n_2\cos\theta_t}\right|^2 \\
+R_p = \left|\frac{n_1\cos\theta_t-n_2\cos\theta_i}{n_1\cos\theta_t+n_2\cos\theta_i}\right|^2 \\
+R_{eff} = \frac{R_s+R_p}{2}
+$$
+{{</asis>}}
+
+#### Schlick's approximation
+{{<asis>}}
+$$
+R(\theta) = R_0 + (1-R_0)(1-\cos\theta)^5 \\
+R_0 = (\frac{n_1-n_2}{n_1+n_2})^2
+$$
+{{</asis>}}
+
+### 微表面模型 Microfacet Material
+近处是几何，远处是材质。使用微表面材质得法线分布来定义材质。glossy法线分布相对集中，diffuse法线分布相对分散。
+
+{{<asis>}}
+$$
+f(i,o) = \frac{F(i,h)G(i,o,h)D(h)}{4(n,i)(n,o)}
+$$
+{{</asis>}}
+F为菲涅尔项，G为自阴影项（shadowing-masking term），D为法线分布。平射光线(掠射角度Grazing Angle)更容易被自阴影挡住。
+
+### 各向同性/异性材质 Isotropic/Anisotropic Materials (BRDFs)
+*没说怎么模拟解决，只提了几个case。*
+
+### BRDF的若干性质
+- 非负性
+- 线性：指线性可加，可分为不同部分分别计算后相加（Blinn-Phong的正确性来源）
+- 可逆性：交换入射出射方向，数值完全一致
+- 能量守恒：BRDF给定出射角，对所有入射角积分，值小于等于1：保证了光追收敛
+- 各向同性与各项异性
+  - 各向同性中$f_r(\theta_i,\phi_i;\theta_r,\phi_r) = f_r(\theta_i,\theta_r,\phi_r-\phi_i)$，四维降为三维函数
+  - 由可逆性可知  
+    $f_r(\theta_i,\theta_r,\phi_r-\phi_i)=f_r(\theta_r,\theta_i,\phi_i-\phi_r)=f_r(\theta_i,\theta_r,|\phi_r-\phi_i|)$
+
+### 测量BRDF
+- Image-based: Gonioreflectometer / spherical gantry
+- 材质存储：耗空间大。MERF BRDF Database可供参考。存储压缩是一个时兴话题。
