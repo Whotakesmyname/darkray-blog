@@ -928,3 +928,183 @@ F为菲涅尔项，G为自阴影项（shadowing-masking term），D为法线分�
 ### 测量BRDF
 - Image-based: Gonioreflectometer / spherical gantry
 - 材质存储：耗空间大。MERF BRDF Database可供参考。存储压缩是一个时兴话题。
+
+## L18 高阶渲染话题 Advanced Topics in Rendering
+### 高级光线传播 Advanced Light Transport
+- 无偏光线传播方式 Unbiased light transport methods
+  - Bidirectional path tracing (BDPT)
+  - Metropilis light transport (MLT) *named after inventor*
+- 有偏光线传播 Biased light transport methods
+  - Photon mapping 光子映射
+  - Vertex connection and merging (VCM) 光子映射+双向路径追踪
+- Instant radiosity 实时辐射度 (VPL/ many light methods)
+
+#### Biased vs. Unbiased Monte Carlo Estimators
+- 无偏(Unbiased)估计期望值始终等于真实值，无系统性误差
+- 否则有偏(Biased)
+  - 当期望值随样本数增多收敛到真实值，则它是一致的(Consistent)
+
+#### 双向路径追踪 (BDPT)
+从光源与摄像机分别进行子路径追踪。
+
+- 如果在光源处光线路径复杂，则效果较好
+- 难以实现，速度慢
+
+#### Metropolis Light Transport
+- 使用马尔科夫链(MCMC)进行采样
+  - 以一定概率分布从当前采样点寻找到下一个采样点
+- 擅长局部探索一些困难的光路
+- 关键思想
+  - 局部扰动一条现存的路径以获得新的路径
+- 优点
+  - 适合解决复杂光路 (e.g. caustics)
+  - 无偏
+- 缺点
+  - 难以估计收敛率
+  - 不保证每个像素有相同的收敛率
+  - 常常产生“脏的”结果
+  - 不常被使用于动画渲染
+
+#### Photon Mapping 光子映射
+- 有偏方法 & 两步方法
+- 非常善于处理Specular-Diffuse-Specular(SDS)路径并产生焦散(caustics)
+
+大致框架：
+1. 光子追踪 photon tracing  
+从光源发射光子，弹射，记录光子最后落在的diffuse表面
+2. 光子收集 photon collection  
+从摄像机发射子路径，弹射，直到击中diffuse表面
+3. 计算局部密度估计 (local density estimation)  
+  - 思想：拥有越多光子的区域越亮
+  - 对每个着色点，寻找最近N个光子，取其覆盖面积，计算密度
+    - 如：最近着色点取包围球，求球体在着色面上的相交面积
+
+##### 有偏的原因
+局部密度估计中$dN/dA \neq \Delta N/\Delta A$
+
+当光子无限多时，以上估计收敛到真实值。因此本方法一致(Consitent)。
+
+渲染中一般来说
+- 有偏方法产生模糊的结果
+- 一致方法在样本数无穷大时变得清晰
+
+当使用固定大小区域估计光子密度时，由于$dA$永远不会变小，因此将永远是一个有偏估计，并且不一致。
+
+#### VCM
+结合双向路径追踪和光子映射
+- 关键思想
+  - 不浪费双向光追中的子路径当追踪终点无法被连接但可以被融合时（指在一个面上邻近）
+  - 使用光子映射来融合邻近光子
+
+电影行业运用广泛
+
+#### Instant Radiosity
+- 有时被称为many-light方法
+- 关键思想
+  - 被照亮的表面可以被认为是光源
+- 方法
+  - 发射子光路并认为每条光路的终点都是一个虚拟点光源 （Virtual Point Light）
+  - 使用虚拟点光源渲染场景
+- 优点
+  - 速度快，在漫反射表面有不错的效果
+- 缺点
+  - 当虚拟点光源接近着色点时会有spikes（异常发光）出现
+    - 类比直接光源采样，对立体角的采样转化为对光源面积采样除以距离。当距离平方项极小，结果被异常放大。
+  - 无法处理光滑(glossy)物体
+
+### 高阶外观建模 Advanced Appearance Modeling
+- 非表面模型 Non-surface models
+  - 散射介质 Participating media
+  - 毛发纤维 (BCSDF)
+  - 颗粒材质 Granular material
+- 表面模型 Surface models
+  - 半透明材质 Translucent material (BSSRDF)
+  - 布料 Cloth
+  - 细节材质 Detailed material (non-statistical BRDF)
+- 生成外观 (Procedral appearance)
+
+#### 散射介质
+- 光线穿过散射介质中的任何时候，它都会（部分）被吸收和散射
+- 使用相位函数（Phase Function) 来描述在散射介质中任意点光线在各个角度上的散射分布
+
+##### 散射介质渲染方法
+- 随机选择弹射方向
+- 随机选择直射距离
+- 在每一个着色点，连接光源
+
+#### 毛发
+有两种高光
+##### Kajiya-Kay 模型
+考虑了圆柱体近似下一定角度的散射+漫反射
+##### Marschner 模型
+将光线分为三部分
+- 圆柱体直接反射R
+- 穿入头发再穿出TT
+- 穿入头发，内部反射后再返回穿出TRT
+
+头发建模为玻璃样圆柱，外层cuticle，内层cortex。
+
+结果真实。多次反射效果很好。计算量大。
+
+##### 双圆柱模型 Double Cylinder Model (Yan model)
+听闫老师讲自己的work。*（其实对我感觉人毛发模型用动物上去还是蛮可以接受的了，就是那示例狼脑袋黑了点）*
+
+新增一个毛发髓质(Medulla)的研究。髓质散射光线。动物毛发相比人有更大的髓质。
+
+相比M模型，新增两个光线分类：原先穿过头发的两类光线受髓质影响新增TRTs & TTs。
+
+猩球崛起和狮子王都有采用该毛发模型。均获得奥斯卡最佳视觉效果提名。
+
+#### 颗粒模型
+分颗粒成分比例进行渲染。没有得到很好的解决。
+
+#### 表面模型 半透明材质
+E.g. 玉石、水母。
+
+##### 次表面反射 Subsurface Scattering
+
+###### Scattering Functions
+BSSRDF: BRDF的延申；一点出射光线受另一点入射光线影响$S(x_i, \omega_i, x_o, \omega_o)$
+
+渲染方程的泛化：对表面的所有点和所有方向积分
+{{<asis>}}
+$$
+L(x_o, \omega_o) = \int_A\int_{H^2}S(x_i,\omega_i,x_o,\omega_o)L_i(x_i,\omega_i)\cos\theta_id\omega_idA
+$$
+{{</asis>}}
+
+##### Dipole Approximation
+近似方法：通过引入两个点光源来近似次表面反射。
+
+适合皮肤渲染。
+
+#### 布料
+- 缠绕纤维的集合
+- 两级缠绕
+  - 纤维(Fiber)缠绕成股(Ply)
+  - 股缠绕成线(Yarn)
+- 线被纺(Woven)或织(Knitted)成不同布料。
+- 给定纺织pattern，计算整体behavior
+
+##### 使用BRDF渲染
+基本操作。但天鹅绒布料不是一个表面，不太合适。
+
+##### 布料：作为散射介质渲染
+- 单独纤维的性质与分布转换为散射参数
+- 当作散射介质渲染
+
+##### 布料：作为实际纤维渲染
+如同毛发渲染。很好的效果，很大的计算量。
+
+#### 复杂外观
+- 动机：渲染过于完美
+
+*闫：博士几年做了一点微小的贡献，大概是三件事：细节渲染是一个，毛发模型是一个，实时光追是一个*
+
+主要展示了下效果。原理听着大概是对于微表面模型的法线分布做了改进，取法线贴图一个周围区域内计算法线pdf，以避免朴素光追在微表面很难追踪到反射到光源的光路的尴尬。
+
+##### 近来潮流：波动光学
+将光学卷到波动光学去。考虑光的干涉。涉及到复数域积分，跳过了实现未谈。效果确实很惊叹。例如磨砂铝表面放大看并不是纯白光，而是包含各种颜色杂光，但整体呈现白色。
+
+#### 程序化生成外观 Procedural Appearance
+通过噪声函数实时生成纹理。
