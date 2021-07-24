@@ -1172,3 +1172,87 @@ $$
 
 ### 景深 Depth of Field
 景深即为CoC足够小（e.g. 小于一像素）的一个成像平面范围。
+
+## L20 颜色与感知 Color and Perception
+### 光场 Light Field / Lumigraph
+#### 全光函数 The Plenoptic Function
+{{<asis>}}
+$$
+P(\theta, \phi, \lambda, t, V_x, V_y, V_z)
+$$
+{{</asis>}}
+以此重建任意位置光场
+
+光场是从任意位置向任意方向的光强度。四维表示。可以使用两个平面描述，各取一点确定一条光线。
+
+#### 光场相机
+将像素替换为透镜，形成微透镜阵列(Microlens array *MLA*)，记录光场（各个像素点上不同方向的光强）信息，从而可以通过计算后期重聚焦、调整光圈大小。
+
+### 颜色的物理基础 Physical Basis of Color
+- 光的电磁波性质
+- 可见光光谱400nm - 700nm
+
+#### 谱功率密度 Spectral Power Distribution
+光在不同波长的强度
+
+### 颜色的生物基础 Biological Basis of Color
+颜色是人类的一种感知。
+- 感光细胞 Retinal Photoreceptor Cells
+  - 视杆细胞 Rods
+    - 在低光状态下的主要感知细胞 （scotopic conditions）
+    - 120M
+    - 感知灰度，不感知颜色
+  - 视锥细胞 Cones
+    - 在典型光照下的感知细胞（photopic）
+    - 6-7M
+    - 三种不同类型，分别对应三种不同光谱敏感性
+      - S：短波长，主要敏感红色
+      - M：中波长，主要敏感黄色
+      - L：长波长，主要敏感蓝色
+    - 提供颜色感知
+
+研究表明，每个人的视锥细胞类型分布很不一样。*暗示每个人的看到的颜色并不一样，看到的世界也不一样。我多年的疑虑并不是多余的。*
+
+人最终感受到的是谱功率密度在三种视锥细胞上积分得到的结果(S, M, L)。
+
+### 同色异谱 Metamerism
+我们呈现颜色的基本原理。只要最终积分得到的结果(S, M, L)一样，我们就会看到一样的颜色，无需重现原本的谱功率密度的光。
+
+### 颜色混合 Color Reproduction / Matching
+#### 加色 Additive Color
+- 给定一组基础光，各有不同的光谱分布
+- 调整这些光的亮度并相加
+- 颜色便被三个标量描述
+
+就是RGB了。
+
+需要注意的是这里允许标量是负的，实际是在被测颜色中加上负标量对应量的分色。
+
+### 色彩空间 Color Space
+#### 标准RGB sRGB
+- 制作特定显示器RGB标准
+- 其他颜色设备通过校准模拟该显示器
+- 广泛使用
+- 色域有限
+
+#### 全局色彩空间 CIE XYZ
+- 一套人造的色彩标准，想象的标准色XYZ
+  - 不存在符合这套匹配函数的标准色
+  - Y是亮度
+- 设计目的
+  - 匹配函数严格正
+  - 覆盖所有可见光
+
+#### Separating Luminance, Chromaticity
+将XYZ归一化为xyz，固定Y，使用xy绘图描述色域。
+
+#### CIE Chromaticity Diagram
+色域中心为白色。
+
+#### 感知组织颜色空间 Perceptually Organized Color Space
+- HSV颜色空间 Hue-Saturation-Value
+- CIELAB Space
+  - 轴两端为互补色（*互补色的两个实验很强很有意思，之前好像见得不多*）
+
+#### 减色
+CMYK，K黑色出于成本考虑。
