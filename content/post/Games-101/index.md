@@ -1294,7 +1294,7 @@ $f = -k_d \dot{b}$
 改进得到一种适用的阻尼表达：
 {{<asis>}}
 $$
-f_b = -k_d\frac{b-a}{\|b-a\|}(\dot{b} - \dot{a})\dot\frac{b-a}{\|b-a\|}
+f_b = -k_d\frac{b-a}{\|b-a\|}(\dot{b} - \dot{a})\dot \frac{b-a}{\|b-a\|}
 $$
 {{</asis>}}
 
@@ -1350,3 +1350,194 @@ $$
 - 劣势
   - 复杂昂贵的场景
   - 捕捉的动画可能不能满足艺术需要，需要调整
+
+## L22 动画 Animation (Cont.)
+### 单粒子模拟 Single Paritcle Simulation
+假设已知任意时间与位置的速度，即拥有一个速度场，可表示为$v(x,t)$。
+可通过解一个一阶常微分方程(Ordinary Differential Equation ODE)得到粒子在不同时间的位置。
+
+{{<asis>}}
+$$
+\frac{dx}{dt} = \dot{x} = v(x, t)
+$$
+{{</asis>}}
+
+#### 欧拉方法 Euler's Method
+又名前向欧拉，显式欧拉。
+- 简单的迭代法
+- 广泛运用
+- 非常不准
+- 大多数情况下不稳定
+
+{{<asis>}}
+$$
+x^{t+\Delta t} = x^t + \Delta t\dot{x}^t \\
+\dot{x}^{t+\Delta t} = \dot{x}^t + \Delta t \ddot{x}^t
+$$
+{{</asis>}}
+
+完全使用上一时刻的量来估计下一时刻的状态。**误差会随着数值积分而累积。欧拉方法积分尤其不好。**
+这可以通过使用小步长来缓解。
+
+考虑一个圆周速度场。完美情况下粒子作圆周运动。但任意步长下的显式欧拉方法都会使得例子向外螺旋飞出。
+这表明显式欧拉法的误差存在正反馈，越来越大。
+稳定性方面存在两个关键问题：
+- 步长增加，精确度下降
+- 不稳定性是一个常见、严重的问题导致模拟发散
+
+##### 误差与不稳定 Error and Instability
+通过有限差分解决数值积分导致两种问题：
+- 误差
+  - 误差随着迭代累积，精确度越来越低
+  - 误差在图形学应用可能并不关键
+- 不稳定性
+  - 误差会复合(compound)，导致模拟发散，尽管真实系统并不会
+  - 缺少稳定性是基础问题，不可忽视
+
+#### 对抗不稳定 Combat Instability
+##### 中点法 Midpoint Method
+- 计算欧拉步骤(Euler step)
+- 在欧拉步骤的中点计算导数(derivative)
+- 使用中点导数更新位置
+
+{{<asis>}}
+$$
+x_{\text{mid}} = x(t) + \Delta t/2 \dot v(x(t), t) \\
+x(t+ \Delta t) = x(t) + \Delta t \dot v(x_{\text{mid}}, t)
+$$
+{{</asis>}}
+
+##### 自适应步长 Adaptive Step Size
+- 基于误差估计选择步长的技术
+- 非常实用
+- 可能会需要很小的步长
+
+重复以下步骤直到误差小于阈值：
+- 计算欧拉方法步骤，步长T
+- 计算两次欧拉方法步骤，步长T/2
+- 计算以上两次结果误差
+- 如果误差大于阈值则减小步长并重试
+
+##### 隐式欧拉方法 Implicit Euler Method
+使用下一时刻的速度与加速度来计算当前步骤。使用解析解或牛顿法求解。提供很好的稳定性。
+{{<asis>}}
+$$
+x^{t+\Delta t} = x^t + \Delta t\dot{x}^{t+\Delta t} \\
+\dot{x}^{t+\Delta t} = \dot{x}^t + \Delta t \ddot{x}^{t+\Delta t}
+$$
+{{</asis>}}
+
+###### 衡量稳定性
+- 衡量方法
+  - 局部截断误差(local truncation error)：每一步的误差
+  - 整体累计误差(total accumulated error)：整体误差
+- 绝对数值并不重要，阶(order)是需要关心的
+- 隐式欧拉法拥有1阶误差
+  - 局部截断误差$O(h^2)$
+  - 全局累积误差$O(h)$
+  - h指步长
+  - 意味着步长减半，全局误差减半
+
+##### 龙格库塔方法 Runge-Kutta Families
+指一类解决常微分方程的高阶方法
+- 非常善于处理非线性
+- 四阶版本被广泛使用，即**RK4**
+
+初始情况
+{{<asis>}}
+$$
+\frac{dy}{dt} = f(t, y),\ y(t_0) = y_0
+$$
+{{</asis>}}
+
+RK4 solution
+{{<asis>}}
+$$
+y_{n+1} = y_n + \frac{1}{6}h(k_1 + 2k_2 + 2k_3 + k_4) \\
+t_{n+1} = t_n + h
+$$
+{{</asis>}}
+
+where
+{{<asis>}}
+$$
+\begin{aligned}
+k_1 = f(t_n, y_n) \\
+k_2 = f(t_n + \frac{h}{2}, y_n + h \frac{k_1}{2}) \\
+k_3 = f(t_n + \frac{h}{2}, y_n + h \frac{k_2}{2}) \\
+k_4 = f(t_n + h, y_n + hk_3)
+\end{aligned}
+$$
+{{</asis>}}
+
+#### 基于位置的/魏莱积分 Position-Based / Verlet Integration
+- 思想
+  - 在改进欧拉法之后，约束粒子位置来防止发散、不稳定行为
+  - 使用约束位置来计算速度
+  - 这些思想都会损失能量，稳定
+- 优缺点
+  - 快速简便
+  - 不基于物理，损失能量导致误差
+
+#### 刚体模拟 Rigid Body Simulation
+- 类似粒子模拟
+- 只需要多考虑一些属性
+
+{{<asis>}}
+$$
+\frac{d}{dt}
+\begin{pmatrix}
+X \\ \theta \\ \dot{X} \\ \omega
+\end{pmatrix}
+=
+\begin{pmatrix}
+\dot{X} \\ \omega \\ F / M \\ \Gamma / I
+\end{pmatrix}
+$$
+{{</asis>}}
+
+- X: 位置
+- $\theta$：旋转角度 (rotation angle)
+- $\omega$：角速度 (angular velocity)
+- F：力
+- $\Gamma$：扭矩 (torque)
+- I: 转动惯量 （momentum of inertia）
+
+#### 流体模拟 Fluid Simulation
+##### Position-Based Method
+不是基于物理的模型
+关键思想：
+- 认为水由刚体小球组成
+- 假设水不可压缩
+- 任何位置小球密度的改变需要被通过改变粒子位置“修正”
+- 需要知道任意位置的密度梯度，该梯度与粒子位置有关
+- 通过梯度下降更新
+
+#### 拉格朗日方法与欧拉方法 Eulerian vs. Lagrangian
+*又见面了。草草地复习。*
+- 拉格朗日质点法
+- 欧拉网格法
+
+##### 物质点法 Material Point Method (MPM)
+混合方法，结合欧拉法与拉格朗日法。
+- 拉格朗日部分：认为粒子携带物质属性
+- 欧拉部分：使用网格进行数值积分
+- 交互：粒子转移属性到网格，网格更新后插值回粒子
+
+# 完结
+> 张无忌学完之后，张三丰问：还记得吗？
+> 张无忌答：全都记得
+> 过了一会又问：现在呢？
+> 无忌答：已经忘却了一小半。
+> 又一会，答：啊，已经忘了一大半。
+> 到最后：已经全都忘了，忘得干干净净。
+
+回到一切的开始。计算机图形学大致四部分内容：
+- 光栅化
+- 几何
+- 光线传播
+- 动画/仿真
+
+光栅化的内容教得差不多了。几何的路还很长。光线传播后面还有课可以听，包括实时光线追踪。仿真之后有胡的课，*猜测应该是和胡的work**太极**关系紧密。看着太极起步到发展，效果确实很好，给GPU编程搭了类似Python的普及化桥梁，做了各种优化，感觉很适合上手，但不知道工业应用怎么样。*
+
+路漫漫其修远兮。
