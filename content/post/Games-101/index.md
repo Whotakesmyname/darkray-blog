@@ -5,6 +5,8 @@ date: 2021-04-21T22:19:23+08:00
 image: alexander-ant-kvMZ-xXFrA4-unsplash.jpg
 tags: [ note ]
 categories: [ 'Computer Graphics', Chinese ]
+math: true
+toc: true
 ---
 
 不用的东西学了总是会忘掉。我还是做点笔记吧。

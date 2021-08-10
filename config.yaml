@@ -4,6 +4,8 @@ title: Darkray Blog
 paginate: 10
 theme: hugo-theme-stack
 
+disqusShortname: darkray
+
 DefaultContentLanguage: en
 
 permalinks:
@@ -34,14 +36,16 @@ params:
             src: img/avatar.jpg
 
     article:
-        math: true
+        math: false
+        toc: true
+        readingTime: true
         license:
             enabled: true
             default: Darkray Blog is licensed under CC BY-NC-ND 4.0
 
     comments:
         enabled: true
-        provider: utterances
+        provider: disqus
 
         utterances:
             repo: Whotakesmyname/darkray-blog
@@ -105,6 +109,8 @@ menu:
           url: https://github.com/Whotakesmyname
           weight: -80
           pre: brand-github
+          params:
+            newTab: true
 
 related:
     includeNewer: true
@@ -127,5 +133,5 @@ markup:
             unsafe: true
     tableOfContents:
         endLevel: 5
-        ordered: true
-        startLevel: 1
+        ordered: false
+        startLevel: 2
