@@ -15,27 +15,34 @@ jobs:
     environment: production-tencent
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout full code with theme
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          
-      - name: Hugo setup
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: latest
-          extended: true
-          
-      - name: Tencent CloudBase Github Action
-        uses: TencentCloudBase/cloudbase-action@v2
-        with:
-          # 云开发 secretId
-          secretId: ${{secrets.ID}}
-          # 云开发 secretKey
-          secretKey: ${{secrets.KEY}}
-          # 云开发环境 Id
-          envId: ${{secrets.ENV}}
+      - name: Trigger coding.net building process
+        run: |
+          curl -u ${{secrets.CODING_TOKEN}} \
+            -v -X POST  '${{secrets.TRIGGER_URL}}' \
+            -H 'Content-Type: application/json' \
+            -d '
+              {
+              "ref": "main",
+              "envs": [
+                  {
+                      "name": "COS_BUCKET_NAME",
+                      "value": "${{secrets.BUCKET_NAME}}",
+                      "sensitive": 0
+                  },
+                  {
+                      "name": "COS_BUCKET_REGION",
+                      "value": "ap-shanghai",
+                      "sensitive": 0
+                  },
+                  {
+                      "name": "COS_UPLOAD_FROM_PATH",
+                      "value": "./public/",
+                      "sensitive": 0
+                  }
+                ]
+              }'

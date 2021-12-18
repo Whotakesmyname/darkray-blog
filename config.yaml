@@ -102,14 +102,15 @@ menu:
           name: Home
           url: /
           weight: -100
-          pre: home
+          params:
+            icon: home
 
         - identifier: github
           name: Github
           url: https://github.com/Whotakesmyname
           weight: -80
-          pre: brand-github
           params:
+            icon: brand-github
             newTab: true
 
 related:
