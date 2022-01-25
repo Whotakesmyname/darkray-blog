@@ -24,3 +24,8 @@ _testmain.go
 
 /public/
 .DS_Store
+
+# Hugo resources cache kept to speedup build process
+# /resources/
+# Ignore lock file
+/.hugo_build.lock
