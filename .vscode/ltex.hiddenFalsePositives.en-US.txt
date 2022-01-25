@@ -1,0 +1,1 @@
+{"rule":"SOME_OF_THE","sentence":"^\\QWhen is a Discrete Definition \"Good\"\nMany criteria:\nsatisfies (some of the) same properties/theorems as smooth curvature\\E$"}
