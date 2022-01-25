@@ -9,7 +9,8 @@ license: CC BY-NC-ND
 menu:
     main: 
         weight: -90
-        pre: user
+        params:
+          icon: user
 ---
 
 I am Hrrison Chen, a student. This is my personal blog.
