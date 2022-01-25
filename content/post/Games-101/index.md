@@ -3,7 +3,7 @@ title: "Games 101"
 description: A bite of Computer Graphics
 date: 2021-04-21T22:19:23+08:00
 image: alexander-ant-kvMZ-xXFrA4-unsplash.jpg
-tags: [ note ]
+tags: [ 'course note' ]
 categories: [ 'Computer Graphics', Chinese ]
 math: true
 toc: true
