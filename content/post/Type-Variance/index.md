@@ -3,7 +3,7 @@ title: "Covariance, Contravariance and Invariance"
 description: Is a Cat[] an Animal[]?
 date: 2022-01-26T21:55:09-05:00
 image: rock-vincent-guitard-unsplash.jpg
-tags: ['Type System']
+tags: ['type system']
 categories: ['Computer Science']
 math: true
 ---
