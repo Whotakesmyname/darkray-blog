@@ -155,7 +155,7 @@ cumulative entries # by column = {cumulative sum of number of values per col};
 ```
 
 ##### Half Edge Mesh
-You should have learnt that in Computer Graphics.
+You should have learned that in Computer Graphics.
 
 ##### Quad Edges
 Skipped
