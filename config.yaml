@@ -127,7 +127,6 @@ related:
 markup:
     highlight:
         noClasses: false
-        linenos: true
         guessSyntax: true
     goldmark:
         renderer:

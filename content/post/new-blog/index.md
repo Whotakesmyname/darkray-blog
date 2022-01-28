@@ -55,7 +55,7 @@ categories: [ Programming, Chinese ]
 上层优先级高于下层。那么热爱least scope的我们当然会选择把secrets保存在environment里。那么就遇到了一个初始文档里没有提及的问题：environment需要和job绑定。
 
 配置文件中jobs字段新增property:
-```yaml
+```yaml {linenos=true}
 jobs:
   build:
     environment: your-environment-name
@@ -110,7 +110,7 @@ Github Action有个令我难受的地方是配置文件需要在项目根目录`
 ## cloudbaserc.json
 你会发现我把build的步骤放在了deploy时由cloudbase action帮忙做了。如果未来有多host部署，这一步可以拆出由单独的job/step完成。
 
-```json
+```json {linenos=true}
 {
     "envId": "{{env.ENV_ID}}",
     "$schema": "https://framework-1258016615.tcloudbaseapp.com/schema/latest.json",
@@ -135,7 +135,7 @@ Github Action有个令我难受的地方是配置文件需要在项目根目录`
 
 ## main.yml
 workflow定义文件
-```yaml
+```yaml {linenos=true}
 name: Build & Deploy
 
 # Controls when the action will run. 
