@@ -2,3 +2,5 @@ Simplicial
 simplicial
 simplices
 TODO
+
+Eulerian
