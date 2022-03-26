@@ -30,7 +30,7 @@ After working out velocity, immediately check boundary constraints (e.g. ground 
 Explicit (forward Euler, symplectic Euler, RK, ...)
 - Future depends only on past
 - Easy to implement
-- Easy to explode $\delta t \le c \sqrt{m/k}$ (c ~ 1)
+- Easy to explode $\Delta t \le c \sqrt{m/k}$ (c ~ 1)
 - Bad for stiff materials
 
 Why explode? The time step cannot capture more than 1 cycle spring oscillation.
